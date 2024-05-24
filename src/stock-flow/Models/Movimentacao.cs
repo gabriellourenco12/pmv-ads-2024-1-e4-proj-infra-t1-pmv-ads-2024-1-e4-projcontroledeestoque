@@ -1,5 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDbGenericRepository.Attributes;
 
 namespace stock_flow.Models
@@ -11,6 +11,7 @@ namespace stock_flow.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; } 
 
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Produto { get; set; } = string.Empty;
 
         public string Tipo { get; set; } = string.Empty;
