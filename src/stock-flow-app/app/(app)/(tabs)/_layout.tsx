@@ -7,7 +7,6 @@ import {useColorScheme} from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
     const colorScheme = useColorScheme();
-    console.log('TabLayout aqui')
 
     return (
         <Tabs
@@ -17,14 +16,16 @@ export default function TabLayout() {
             }}>
 
             <Tabs.Screen
-                name="produtos"
+                name="index"
                 options={{
-                    title: 'Estoque',
+                    title: 'Produtos',
                     tabBarIcon: ({color, focused}) => (
                         <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color}/>
                     ),
                 }}
+                
             />
+            
             <Tabs.Screen
                 name="fornecedores"
                 options={{
@@ -43,24 +44,12 @@ export default function TabLayout() {
                     ),
                 }}
             />
-
-
-            {/*TODO: Exemplos de telas e configurações, depois alterar o index e apontar para produtos*/}
             <Tabs.Screen
-                name="index"
+                name="usuario"
                 options={{
-                    title: 'Welcome',
+                    title: 'Conta',
                     tabBarIcon: ({color, focused}) => (
-                        <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color}/>
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="explore"
-                options={{
-                    title: 'Explore',
-                    tabBarIcon: ({color, focused}) => (
-                        <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color}/>
+                        <TabBarIcon name={focused ? 'person-circle' : 'person-circle-outline'} color={color}/>
                     ),
                 }}
             />

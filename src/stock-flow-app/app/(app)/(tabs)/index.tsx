@@ -1,70 +1,97 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import {Pressable, StyleSheet, TextInput} from 'react-native';
+import {ThemedText} from '@/components/ThemedText';
+import {ThemedView} from '@/components/ThemedView';
+import {useEffect, useState} from "react";
+import {useSession} from "@/store/SessionProvider";
+import LoadingOverlay from "@/components/LoadingOverlay";
+import {router} from "expo-router";
+import ThemedViewRoot from "@/components/ThemedViewRoot";
+import ListProduto from "@/components/produtos/ListProduto";
+import {ProdutosQueryParams, ProdutosResponse} from '@/services/produtos';
+import {MOCK_PRODUTOS} from "@/constants/MockData";
+import {useThemeColorName} from "@/hooks/useThemeColor";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function ProdutosScreen() {
+    const {session, isLoading} = useSession();
+    const [produtos, setProdutos] = useState<ProdutosResponse[]>([]);
+    const [appIsReady, setAppIsReady] = useState(false);
+    const [search, setSearch] = useState('');
+    const textInputColor = useThemeColorName("textInput");
+    const iconColor = useThemeColorName("icon");
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+    const handleSearch = () => {
+        if (!search) return;
+
+        setAppIsReady(false);
+        fetchProdutos({nome: search})
+            .then(() => setTimeout(() => {
+                setAppIsReady(true);
+                setSearch('');
+            }, 1000));
+    }
+
+    async function fetchProdutos(queryParams: ProdutosQueryParams) {
+        //TODO: Remover MOCK e descomentar FetchProdutos
+        //const fetchData = await FetchProdutos(queryParams);
+        const fetchData: ProdutosResponse[] = MOCK_PRODUTOS;
+        setProdutos(fetchData);
+    }
+
+    useEffect(() => {
+        setAppIsReady(false);
+        fetchProdutos({}).then(() => setTimeout(() => setAppIsReady(true), 1000));
+
+    }, []);
+
+    if (isLoading || !appIsReady) {
+        return <LoadingOverlay message="Buscando Produtos..."/>;
+    }
+
+    if (!session) {
+        router.replace('(auth)');
+    }
+
+    return (
+        <ThemedViewRoot>
+            <ThemedView>
+                <ThemedText type="title">Produtos</ThemedText>
+            </ThemedView>
+
+            <ThemedView style={styles.searchContainer}>
+                <TextInput style={[{borderColor: iconColor, backgroundColor: textInputColor}, styles.textInput]}
+                           onChangeText={text => setSearch(text)}
+                           value={search}
+                           placeholder="Pesquisar..."
+                />
+
+                <Pressable style={styles.button} onPress={handleSearch}>
+                    <Ionicons name="search" size={24} color={iconColor}/>
+                </Pressable>
+            </ThemedView>
+
+            <ListProduto produtos={produtos}/>
+        </ThemedViewRoot>
+    );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    searchContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+
+    textInput: {
+        flex: 1,
+        paddingVertical: 4,
+        paddingHorizontal: 10,
+        borderRadius: 10,
+        borderWidth: 2,
+        marginRight: 15,
+    },
+
+    button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
 });
