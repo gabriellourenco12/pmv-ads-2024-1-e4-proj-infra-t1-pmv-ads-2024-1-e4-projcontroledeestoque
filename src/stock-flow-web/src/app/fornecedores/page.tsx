@@ -3,10 +3,10 @@ import React, {useEffect, useRef, useState} from 'react'
 import Navigation from '../components/Navigation'
 import {Fornecedor, getFornecedores} from '../services/fornecedores'
 import {NotePencil, TrashSimple} from '@phosphor-icons/react'
-import DeleteModal from '../components/DeleteModalFornecedor'
-import FornecedorModal from '../components/FornecedorModal'
+import DeleteModal from '../components/FornecedorModal/DeleteModalFornecedor'
+import FornecedorModal from '../components/FornecedorModal/FornecedorModal'
 import {toast} from 'react-toastify'
-import EditFornecedorModal from '../components/EditFornecedorModal'
+import EditFornecedorModal from '../components/FornecedorModal/EditFornecedorModal'
 import {Loading} from '@/app/components/Loading'
 import {URLS} from '@/app/utils/constantes'
 import {useRouter} from 'next/navigation'
@@ -65,12 +65,6 @@ export default function Fornecedores() {
         setSelectedFornecedor(fornecedor)
         setDetailsModalOpen(true)
     }
-
-    const handleCloseDetailsModal = () => {
-        setDetailsModalOpen(false)
-        setSelectedFornecedor(null)
-    }
-
     const handleSearch = () => {
         getFornecedores({name: filter}).then((data) => {
             setFornecedores(data)
