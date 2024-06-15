@@ -197,10 +197,17 @@ namespace stock_flow.Services.Impl
                     Data = movimentacao.Data
                 };
 
-                if (produto.Fornecedores.Count > 0)
+                if (produto.Fornecedores != null && produto.Fornecedores.Count > 0)
                 {
-                    var fornecedores = await _produtoService.GetFornecedoresDoProdutoAsync(movimentacao.Produto);
-                    movimentacaoAggregateDto.FornecedoresNomes = fornecedores.ToList().Select(fornecedor => fornecedor.Nome).ToList();
+                    try
+                    {
+                        var fornecedores = await _produtoService.GetFornecedoresDoProdutoAsync(movimentacao.Produto);
+                        movimentacaoAggregateDto.FornecedoresNomes = fornecedores.ToList().Select(fornecedor => fornecedor.Nome).ToList();
+                    }
+                    catch (Exception e)
+                    {
+                        movimentacaoAggregateDto.FornecedoresNomes = new List<string>();
+                    }
                 }
 
                 movimentacoesAggregateDto.Add(movimentacaoAggregateDto);
