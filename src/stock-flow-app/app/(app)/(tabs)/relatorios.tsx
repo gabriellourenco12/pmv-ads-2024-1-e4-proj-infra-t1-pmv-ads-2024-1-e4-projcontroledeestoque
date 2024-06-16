@@ -14,14 +14,25 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {useThemeColorName} from "@/hooks/useThemeColor";
 
 export default function RelatoriosScreen() {
-    const {session, isLoading} = useSession();
+    const {isValidSession, isLoading} = useSession();
     const [appIsReady, setAppIsReady] = useState(false);
     const [relatorios, setRelatorios] = useState<RelatoriosResponse[]>([]);
     const [dataInicio, setDataInicio] = useState(new Date());
     const [dataFim, setDataFim] = useState(new Date());
     const [showDataInicioPicker, setShowDataInicioPicker] = useState(false);
     const [showDataFimPicker, setShowDataFimPicker] = useState(false);
+    const textInputColor = useThemeColorName("textInput");
     const iconColor = useThemeColorName("icon");
+
+    useEffect(() => {
+        setAppIsReady(false);
+
+        if (!isValidSession()) {
+            router.replace('(auth)');
+        }
+
+        fetchRelatorios({}).then(() => setTimeout(() => setAppIsReady(true), 1000));
+    }, []);
 
     const handleDataInicio = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
         const currentDate = selectedDate || dataInicio;
@@ -46,17 +57,8 @@ export default function RelatoriosScreen() {
         setRelatorios(fetchData);
     }
 
-    useEffect(() => {
-        setAppIsReady(false);
-        fetchRelatorios({}).then(() => setTimeout(() => setAppIsReady(true), 1000));
-    }, []);
-
     if (isLoading || !appIsReady) {
         return <LoadingOverlay message="Buscando relatórios..."/>;
-    }
-
-    if (!session) {
-        router.replace('(auth)');
     }
 
     return (
@@ -66,7 +68,8 @@ export default function RelatoriosScreen() {
             </ThemedView>
 
             <ThemedView style={styles.dateContainer}>
-                <Pressable style={[{backgroundColor: iconColor} ,styles.datePicker]} onPress={() => setShowDataInicioPicker(true)}>
+                <Pressable style={[{borderColor: iconColor, backgroundColor: textInputColor}, styles.datePicker]}
+                           onPress={() => setShowDataInicioPicker(true)}>
                     <Text>De: {toLocaleDateString(dataInicio)}</Text>
                 </Pressable>
                 {showDataInicioPicker && (
@@ -81,7 +84,8 @@ export default function RelatoriosScreen() {
                     />
                 )}
 
-                <Pressable style={[{backgroundColor: iconColor} ,styles.datePicker]} onPress={() => setShowDataFimPicker(true)}>
+                <Pressable style={[{borderColor: iconColor, backgroundColor: textInputColor}, styles.datePicker]}
+                           onPress={() => setShowDataFimPicker(true)}>
                     <Text>Até: {toLocaleDateString(dataFim)}</Text>
                 </Pressable>
                 {showDataFimPicker && (
@@ -116,8 +120,9 @@ const styles = StyleSheet.create({
     datePicker: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 10,
+        padding: 8.5,
         borderRadius: 10,
+        borderWidth: 2,
     },
 
     button: {

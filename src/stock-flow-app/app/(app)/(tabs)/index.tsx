@@ -12,7 +12,7 @@ import {useThemeColorName} from "@/hooks/useThemeColor";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function ProdutosScreen() {
-    const {session, isLoading} = useSession();
+    const {isValidSession, isLoading} = useSession();
     const [produtos, setProdutos] = useState<ProdutosResponse[]>([]);
     const [appIsReady, setAppIsReady] = useState(false);
     const [search, setSearch] = useState('');
@@ -35,16 +35,16 @@ export default function ProdutosScreen() {
 
     useEffect(() => {
         setAppIsReady(false);
-        fetchProdutos({}).then(() => setTimeout(() => setAppIsReady(true), 1000));
 
+        if (!isValidSession()) {
+            router.replace('(auth)');
+        }
+
+        fetchProdutos({}).then(() => setTimeout(() => setAppIsReady(true), 1000));
     }, []);
 
     if (isLoading || !appIsReady) {
         return <LoadingOverlay message="Buscando Produtos..."/>;
-    }
-
-    if (!session) {
-        router.replace('(auth)');
     }
 
     return (
@@ -53,8 +53,8 @@ export default function ProdutosScreen() {
                 <ThemedText type="title">Produtos</ThemedText>
             </ThemedView>
 
-            <ThemedView style={styles.searchContainer}>
-                <TextInput style={[{borderColor: iconColor, backgroundColor: textInputColor}, styles.textInput]}
+            <ThemedView style={[{borderColor: iconColor, backgroundColor: textInputColor}, styles.searchContainer]}>
+                <TextInput style={styles.textInput}
                            onChangeText={text => setSearch(text)}
                            value={search}
                            placeholder="Pesquisar..."
@@ -74,19 +74,19 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        borderRadius: 10,
+        borderWidth: 2,
     },
 
     textInput: {
         flex: 1,
         paddingVertical: 4,
         paddingHorizontal: 10,
-        borderRadius: 10,
-        borderWidth: 2,
-        marginRight: 15,
     },
 
     button: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingRight: 10,
     },
 });
